@@ -5,21 +5,27 @@ interface Coordinates {
   longitude: number;
 }
 
-interface Store {
+export interface Store {
   id: UUID;
   name: string;
   location: Coordinates;
+}
+
+interface StoreAisle {
+  id: UUID;
+  storeId: UUID;
+  start: Coordinates; // Northernmost point
+  end: Coordinates;
 }
 
 interface StoreItem {
   id: UUID;
   storeId: UUID;
+  aisleId: UUID;
   name: string;
-  asile?: string;
-  location: Coordinates;
 }
 
 interface ShoppingList {
-  storeId: UUID;
-  items: Pick<StoreItem, "id" | "name" | "asile" | "location">[];
+  id: UUID;
+  items: Pick<StoreItem, "id" | "name" | "aisleId">[];
 }
