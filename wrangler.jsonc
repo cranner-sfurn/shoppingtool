@@ -11,6 +11,19 @@
     "binding": "ASSETS",
     "directory": ".open-next/assets"
   },
+  "kv_namespaces": [
+    {
+      "binding": "CACHE",
+      "id": "17c43d8b535e4d07a748591fdab73e65"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "shoppingtool-db",
+      "database_id": "a441a3f2-e918-46f8-b385-b9c815b94021"
+    }
+  ],
   "observability": {
     "enabled": true
   },
