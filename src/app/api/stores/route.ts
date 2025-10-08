@@ -4,7 +4,7 @@ import { createPrismaClient } from "@lib/db";
 
 // Cache configuration
 const CACHE_KEY = "stores:all";
-const CACHE_TTL = 300; // 5 minutes in seconds
+const CACHE_TTL = 60 * 60 * 1; // 1 hour in seconds
 
 export async function GET() {
   try {
