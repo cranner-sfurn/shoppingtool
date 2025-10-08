@@ -1,13 +1,10 @@
 import { NextResponse } from "next/server";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { drizzle } from "drizzle-orm/d1";
+import { getDb } from "@/lib/db";
 import { store } from "@/db/schema";
 export async function GET() {
   try {
-    // Get Cloudflare context to access D1 database
-    const cloudflareContext = getCloudflareContext();
-
-    const db = drizzle(cloudflareContext.env.DB);
+    // Get database connection
+    const db = getDb();
     const result = await db.select().from(store);
 
     // Return all stores from the database
