@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@lib/*": ["./src/app/lib/*"]
     },
     "types": ["./env.d.ts", "node"]
   },
