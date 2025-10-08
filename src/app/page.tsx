@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Store } from "@lib/types";
+import { Store } from "@/lib/types";
 
 async function fetchStores(): Promise<Store[]> {
   const response = await fetch("/api/stores");
