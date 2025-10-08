@@ -1,6 +1,6 @@
 export type UUID = string;
 
-interface Coordinates {
+export interface Coordinates {
   latitude: number;
   longitude: number;
 }
@@ -11,7 +11,7 @@ export interface Store {
   location: Coordinates;
 }
 
-interface StoreAisle {
+export interface StoreAisle {
   id: UUID;
   storeId: UUID;
   start: Coordinates; // Northernmost point
@@ -25,7 +25,7 @@ interface StoreItem {
   name: string;
 }
 
-interface ShoppingList {
+export interface ShoppingList {
   id: UUID;
   items: Pick<StoreItem, "id" | "name" | "aisleId">[];
 }
