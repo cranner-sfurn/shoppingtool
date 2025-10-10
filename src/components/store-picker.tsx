@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StoresApiResponse } from "@/lib/api-types";
+import { useLocation } from "@/lib/location-context";
+import { calculateDistanceInMiles } from "@/lib/coordinates";
 
 // fetch the stores to show after location is found
 async function fetchStores(): Promise<StoresApiResponse> {
@@ -18,6 +20,7 @@ async function fetchStores(): Promise<StoresApiResponse> {
 
 export default function StorePicker() {
   const router = useRouter();
+  const { location } = useLocation();
 
   // get store data from the api
   const {
@@ -76,21 +79,37 @@ export default function StorePicker() {
     <div className="space-y-6">
       {/* Show the stores */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {stores?.map((store) => (
-          <Card key={store.id}>
-            <CardHeader>
-              <CardTitle>{store.name}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Button
-                onClick={() => handleStoreSelect(store.id)}
-                className="w-full"
-              >
-                Select Store
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
+        {stores?.map((store) => {
+          const distance = location
+            ? calculateDistanceInMiles(
+                location.latitude,
+                location.longitude,
+                store.latitude,
+                store.longitude
+              )
+            : null;
+
+          return (
+            <Card key={store.id}>
+              <CardHeader>
+                <CardTitle>{store.name}</CardTitle>
+                {distance !== null && (
+                  <p className="text-sm text-gray-600">
+                    {distance.toFixed(2)} miles away
+                  </p>
+                )}
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Button
+                  onClick={() => handleStoreSelect(store.id)}
+                  className="w-full"
+                >
+                  Select Store
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
