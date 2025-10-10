@@ -17,3 +17,19 @@ export function calculateDistance(
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
+
+// Convert meters to miles
+export function metersToMiles(meters: number): number {
+  return meters * 0.000621371;
+}
+
+// Calculate distance in miles between two coordinates
+export function calculateDistanceInMiles(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  const distanceInMeters = calculateDistance(lat1, lon1, lat2, lon2);
+  return metersToMiles(distanceInMeters);
+}
