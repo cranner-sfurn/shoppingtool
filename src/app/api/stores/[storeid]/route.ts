@@ -9,7 +9,7 @@ export async function GET(
   { params }: { params: Promise<{ storeid: string }> }
 ) {
   try {
-    // Get tthe parameters from the request and check the storeid is valid
+    // Get the parameters from the request and check the storeid is valid
     const { storeid: storeId } = await params;
     if (!storeId) {
       return NextResponse.json(
