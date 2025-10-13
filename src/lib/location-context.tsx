@@ -7,14 +7,10 @@ import React, {
   useState,
   ReactNode,
 } from "react";
-
-interface Location {
-  latitude: number;
-  longitude: number;
-}
+import { Coordinates } from "./types";
 
 interface LocationContextType {
-  location: Location | null;
+  location: Coordinates | null;
   error: string | null;
   isLoading: boolean;
 }
@@ -28,7 +24,7 @@ interface LocationProviderProps {
 }
 
 export function LocationProvider({ children }: LocationProviderProps) {
-  const [location, setLocation] = useState<Location | null>(null);
+  const [location, setLocation] = useState<Coordinates | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -39,6 +35,7 @@ export function LocationProvider({ children }: LocationProviderProps) {
       return;
     }
 
+    // attetmpt to get the location
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setLocation({
@@ -91,6 +88,7 @@ export function LocationProvider({ children }: LocationProviderProps) {
   );
 }
 
+// Export for use in other components
 export function useLocation() {
   const context = useContext(LocationContext);
   if (context === undefined) {

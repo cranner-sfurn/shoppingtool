@@ -32,7 +32,7 @@ export default function StorePicker() {
     queryFn: fetchStores,
   });
 
-  // when s atore is selected go to that stores specific handler page
+  // when a store is selected go to that stores specific handler page
   const handleStoreSelect = (storeId: string) => {
     router.push(`/store/${storeId}`);
   };
