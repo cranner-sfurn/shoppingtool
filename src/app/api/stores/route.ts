@@ -1,49 +1,42 @@
 import { NextResponse } from "next/server";
+import { getDb } from "@/lib/db";
+import { store } from "@/db/schema";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { createPrismaClient } from "@lib/db";
 
-// Cache configuration
-const CACHE_KEY = "stores:all";
-const CACHE_TTL = 300; // 5 minutes in seconds
-
+const cacheKey = "store:all";
 export async function GET() {
   try {
-    const { env } = getCloudflareContext();
+    // Get Cloudflare context to access KV
+    const cloudflareContext = getCloudflareContext();
+    const cache = cloudflareContext.env.CACHE;
 
-    // Check KV cache first
-    if (env.CACHE) {
-      try {
-        const cachedStores = await env.CACHE.get(CACHE_KEY);
-        if (cachedStores) {
-          console.log("Cache hit: returning cached stores");
-          return NextResponse.json(JSON.parse(cachedStores));
-        }
-      } catch (kvError) {
-        console.warn("KV cache read error:", kvError);
-      }
+    // Check if stores are already cached
+    const cachedStores = await cache.get(cacheKey, "json");
+
+    if (cachedStores) {
+      // Return cached data
+      return NextResponse.json(cachedStores);
     }
 
-    const prisma = createPrismaClient(env);
-    const stores = await prisma.store.findMany();
+    // If not cached, fetch from database
+    const db = getDb();
+    const result = await db.select().from(store);
 
-    // Store in KV cache with TTL
-    if (env.CACHE) {
-      try {
-        await env.CACHE.put(CACHE_KEY, JSON.stringify(stores), {
-          expirationTtl: CACHE_TTL,
-        });
-        console.log(`Stored stores in cache with TTL: ${CACHE_TTL}s`);
-      } catch (kvError) {
-        console.warn("KV cache write error:", kvError);
-        // Continue without failing the request
-      }
-    }
+    // Cache the result with 1 hour TTL (3600 seconds)
+    await cache.put(cacheKey, JSON.stringify(result), {
+      expirationTtl: 3600,
+    });
 
-    return NextResponse.json(stores);
+    // Return all stores from the database
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Error fetching stores:", error);
     return NextResponse.json(
-      { error: "Failed to fetch stores" },
+      {
+        error: `Failed to fetch stores: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+      },
       { status: 500 }
     );
   }
