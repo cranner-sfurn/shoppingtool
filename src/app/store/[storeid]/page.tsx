@@ -1,10 +1,12 @@
 "use client";
 
+import type React from "react";
+
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 
-import { StoreApiResponse } from "@/lib/api-types";
+import type { StoreApiResponse } from "@/lib/api-types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -196,9 +198,9 @@ export default function StorePage() {
           <Button
             variant="outline"
             onClick={() => router.push("/")}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 text-sm"
           >
-            Back to Store Picker
+            ← Back
           </Button>
         </div>
         <Card>
@@ -241,13 +243,13 @@ export default function StorePage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Left side - Available Items */}
-        <Card>
-          <CardHeader>
+        <Card className="flex flex-col max-h-[calc(100vh-12rem)]">
+          <CardHeader className="flex-shrink-0">
             <CardTitle>Available Items</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex-1 flex flex-col min-h-0">
             {/* Search and Filter Controls */}
-            <div className="mb-4 space-y-3">
+            <div className="mb-4 space-y-3 flex-shrink-0">
               <div>
                 <label className="text-sm font-medium text-gray-700 mb-1 block">
                   Search Items
@@ -292,7 +294,7 @@ export default function StorePage() {
             </div>
 
             {/* Items List */}
-            <div className="space-y-2 max-h-80 sm:max-h-96 overflow-y-auto">
+            <div className="space-y-2 flex-1 overflow-y-auto min-h-0">
               {filteredItems.length === 0 ? (
                 <p className="text-gray-500 text-center py-4">
                   {searchQuery || selectedCategory !== "all"
@@ -338,20 +340,22 @@ export default function StorePage() {
         </Card>
 
         {/* Right side - Shopping List */}
-        <Card>
-          <CardHeader>
+        <Card className="flex flex-col max-h-[calc(100vh-12rem)]">
+          <CardHeader className="flex-shrink-0">
             <CardTitle>
               Your Shopping List ({shoppingList.length} items)
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex-1 flex flex-col min-h-0">
             {shoppingList.length === 0 ? (
-              <p className="text-gray-500 text-center py-6 sm:py-8 text-sm sm:text-base">
-                Your shopping list is empty. Add items from the left to get
-                started!
-              </p>
+              <div className="flex-1 flex items-center justify-center">
+                <p className="text-gray-500 text-center text-sm sm:text-base">
+                  Your shopping list is empty. Add items from the left to get
+                  started!
+                </p>
+              </div>
             ) : (
-              <div className="space-y-2 max-h-80 sm:max-h-96 overflow-y-auto">
+              <div className="space-y-2 flex-1 overflow-y-auto min-h-0">
                 {shoppingList.map((item) => (
                   <div
                     key={item.id}
