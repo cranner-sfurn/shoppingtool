@@ -20,7 +20,6 @@ export const store = sqliteTable("Store", {
   name: text().notNull(),
   latitude: real().notNull(),
   longitude: real().notNull(),
-  adjacencyList: text().notNull(), // JSON string of AdjacencyList for pathfinding
 });
 
 export const category = sqliteTable("Category", {
@@ -37,6 +36,20 @@ export const node = sqliteTable("Node", {
   id: text().primaryKey().notNull(),
   name: text().notNull(),
   isCategory: integer({ mode: "boolean" }).notNull().default(false), // true if this node represents a category
+  storeId: text()
+    .notNull()
+    .references(() => store.id, { onDelete: "cascade", onUpdate: "cascade" }),
+});
+
+export const nodeConnection = sqliteTable("NodeConnection", {
+  id: text().primaryKey().notNull(),
+  fromNodeId: text()
+    .notNull()
+    .references(() => node.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  toNodeId: text()
+    .notNull()
+    .references(() => node.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  weight: integer().notNull(), // Distance/weight between nodes
   storeId: text()
     .notNull()
     .references(() => store.id, { onDelete: "cascade", onUpdate: "cascade" }),
