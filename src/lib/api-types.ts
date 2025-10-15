@@ -3,6 +3,7 @@ export interface StoreApiResponse {
   name: string;
   latitude: number;
   longitude: number;
+  adjacencyList: string;
 }
 
 export type StoresApiResponse = StoreApiResponse[];
