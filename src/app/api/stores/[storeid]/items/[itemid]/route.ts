@@ -9,14 +9,16 @@ export async function GET(
   { params }: { params: Promise<{ storeid: string; itemid: string }> }
 ) {
   try {
-    // Get the parameters from the request and check they are valid
+    // Get the parameters from the request and validate them
     const { storeid: storeId, itemid: itemId } = await params;
+
     if (!storeId) {
       return NextResponse.json(
         { error: "Store ID is required" },
         { status: 400 }
       );
     }
+
     if (!itemId) {
       return NextResponse.json(
         { error: "Item ID is required" },
@@ -29,7 +31,7 @@ export async function GET(
     const cache = cloudflareContext.env.CACHE;
     const cacheKey = `store:${storeId}:item:${itemId}`;
 
-    // Check if store item is already cached
+    // Check if item is already cached
     const cachedItem = await cache.get(cacheKey, "json");
 
     if (cachedItem) {
@@ -45,6 +47,7 @@ export async function GET(
       .select()
       .from(store)
       .where(eq(store.id, storeId));
+
     if (storeResult.length === 0) {
       return NextResponse.json({ error: "Store not found" }, { status: 404 });
     }
@@ -53,7 +56,7 @@ export async function GET(
     const result = await db
       .select()
       .from(storeItem)
-      .where(and(eq(storeItem.storeId, storeId), eq(storeItem.id, itemId)));
+      .where(and(eq(storeItem.id, itemId), eq(storeItem.storeId, storeId)));
 
     if (result.length === 0) {
       return NextResponse.json({ error: "Item not found" }, { status: 404 });
@@ -66,7 +69,7 @@ export async function GET(
       expirationTtl: 3600,
     });
 
-    // Return the specific item
+    // Return the item data
     return NextResponse.json(itemData);
   } catch (error) {
     console.error("Error fetching store item:", error);
