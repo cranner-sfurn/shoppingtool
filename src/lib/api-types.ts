@@ -7,3 +7,13 @@ export interface StoreApiResponse {
 }
 
 export type StoresApiResponse = StoreApiResponse[];
+
+export interface StoreItemApiResponse {
+  id: string;
+  storeId: string;
+  categoryId: string;
+  name: string;
+  description: string | null;
+}
+
+export type StoreItemsApiResponse = StoreItemApiResponse[];
