@@ -8,7 +8,7 @@ import { StoreApiResponse } from "@/lib/api-types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Input } from "../../../components/ui/input";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
 // Types for store items
@@ -16,6 +16,7 @@ interface StoreItem {
   id: string;
   storeId: string;
   categoryId: string;
+  categoryName: string;
   name: string;
   description?: string;
 }
@@ -43,9 +44,10 @@ export default function StorePage() {
   const router = useRouter();
   const storeId = params.storeid as string;
 
-  // State for shopping list and search
+  // State for shopping list, search, and category filter
   const [shoppingList, setShoppingList] = useState<StoreItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   // get the store data from the api
   const {
@@ -69,38 +71,64 @@ export default function StorePage() {
     enabled: !!storeId,
   });
 
-  // Filter items based on search query
+  // Get unique categories for filter dropdown
+  const categories = useMemo(() => {
+    if (!storeItems) return [];
+    const uniqueCategories = Array.from(
+      new Set(storeItems.map((item) => item.categoryName))
+    ).sort();
+    return uniqueCategories;
+  }, [storeItems]);
+
+  // Filter items based on search query and category
   const filteredItems = useMemo(() => {
     if (!storeItems) return [];
-    if (!searchQuery) return storeItems;
-    return storeItems.filter(item =>
-      item.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [storeItems, searchQuery]);
+
+    let filtered = storeItems;
+
+    // Filter by category
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter(
+        (item) => item.categoryName === selectedCategory
+      );
+    }
+
+    // Filter by search query
+    if (searchQuery) {
+      filtered = filtered.filter((item) =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    return filtered;
+  }, [storeItems, searchQuery, selectedCategory]);
 
   // Add item to shopping list
   const addToShoppingList = (item: StoreItem) => {
-    if (!shoppingList.find(listItem => listItem.id === item.id)) {
-      setShoppingList(prev => [...prev, item]);
+    if (!shoppingList.find((listItem) => listItem.id === item.id)) {
+      setShoppingList((prev) => [...prev, item]);
     }
   };
 
   // Remove item from shopping list
   const removeFromShoppingList = (itemId: string) => {
-    setShoppingList(prev => prev.filter(item => item.id !== itemId));
+    setShoppingList((prev) => prev.filter((item) => item.id !== itemId));
   };
 
   // Generate route by grouping items by category
   const generateRoute = () => {
     const groupedByCategory = shoppingList.reduce((acc, item) => {
-      if (!acc[item.categoryId]) {
-        acc[item.categoryId] = [];
+      if (!acc[item.categoryName]) {
+        acc[item.categoryName] = [];
       }
-      acc[item.categoryId].push(item);
+      acc[item.categoryName].push(item);
       return acc;
     }, {} as Record<string, StoreItem[]>);
 
-    console.log("Route generated - Items grouped by category:", groupedByCategory);
+    console.log(
+      "Route generated - Items grouped by category:",
+      groupedByCategory
+    );
     // For now, just log the grouped items. In the future, this could navigate to a route page
   };
 
@@ -186,66 +214,121 @@ export default function StorePage() {
   }
 
   return (
-    <div className="container mx-auto max-w-6xl p-6">
+    <div className="container mx-auto max-w-6xl p-4 sm:p-6">
       {/* Header with back button and store name */}
-      <div className="mb-6 flex items-center justify-between">
-        <Button
-          variant="outline"
-          onClick={() => router.push("/")}
-          className="flex items-center gap-2"
-        >
-          Back to Store Picker
-        </Button>
-        <h1 className="text-2xl font-bold">{store.name} - Shopping List</h1>
-        {shoppingList.length > 0 && (
-          <Button onClick={generateRoute} className="bg-blue-600 hover:bg-blue-700">
-            Generate Route ({shoppingList.length} items)
+      <div className="mb-4 sm:mb-6">
+        <div className="flex items-center justify-between mb-2">
+          <Button
+            variant="outline"
+            onClick={() => router.push("/")}
+            className="flex items-center gap-2 text-sm"
+          >
+            ← Back
           </Button>
-        )}
+          {shoppingList.length > 0 && (
+            <Button
+              onClick={generateRoute}
+              className="bg-blue-600 hover:bg-blue-700 text-sm px-3 py-2"
+            >
+              Route ({shoppingList.length})
+            </Button>
+          )}
+        </div>
+        <h1 className="text-xl sm:text-2xl font-bold text-center sm:text-left">
+          {store.name}
+        </h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Left side - Available Items */}
         <Card>
           <CardHeader>
             <CardTitle>Available Items</CardTitle>
-            <div className="mt-4">
-              <Input
-                placeholder="Search items..."
-                value={searchQuery}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                className="w-full"
-              />
-            </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2 max-h-96 overflow-y-auto">
+            {/* Search and Filter Controls */}
+            <div className="mb-4 space-y-3">
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">
+                  Search Items
+                </label>
+                <Input
+                  placeholder="Search items..."
+                  value={searchQuery}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setSearchQuery(e.target.value)
+                  }
+                  className="text-base" // Prevents zoom on iOS
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                  Filter by Category
+                </label>
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                  <Button
+                    variant={selectedCategory === "all" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedCategory("all")}
+                    className="text-xs px-3 py-1 min-h-[32px] touch-manipulation flex-shrink-0"
+                  >
+                    All
+                  </Button>
+                  {categories.map((category) => (
+                    <Button
+                      key={category}
+                      variant={
+                        selectedCategory === category ? "default" : "outline"
+                      }
+                      size="sm"
+                      onClick={() => setSelectedCategory(category)}
+                      className="text-xs px-3 py-1 min-h-[32px] touch-manipulation flex-shrink-0 whitespace-nowrap"
+                    >
+                      {category}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Items List */}
+            <div className="space-y-2 max-h-80 sm:max-h-96 overflow-y-auto">
               {filteredItems.length === 0 ? (
                 <p className="text-gray-500 text-center py-4">
-                  {searchQuery ? "No items found matching your search." : "No items available."}
+                  {searchQuery || selectedCategory !== "all"
+                    ? "No items found matching your filters."
+                    : "No items available."}
                 </p>
               ) : (
                 filteredItems.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50"
+                    className="flex items-center justify-between p-3 sm:p-4 border rounded-lg hover:bg-gray-50 active:bg-gray-100 touch-manipulation"
                   >
-                    <div className="flex-1">
-                      <h4 className="font-medium">{item.name}</h4>
+                    <div className="flex-1 min-w-0 pr-2">
+                      <h4 className="font-medium text-sm sm:text-base truncate">
+                        {item.name}
+                      </h4>
                       {item.description && (
-                        <p className="text-sm text-gray-600">{item.description}</p>
+                        <p className="text-xs sm:text-sm text-gray-600 truncate mt-1">
+                          {item.description}
+                        </p>
                       )}
-                      <Badge variant="secondary" className="mt-1">
-                        Category: {item.categoryId}
+                      <Badge variant="secondary" className="mt-1 text-xs">
+                        {item.categoryName}
                       </Badge>
                     </div>
                     <Button
                       size="sm"
                       onClick={() => addToShoppingList(item)}
-                      disabled={shoppingList.some(listItem => listItem.id === item.id)}
-                      className="ml-2"
+                      disabled={shoppingList.some(
+                        (listItem) => listItem.id === item.id
+                      )}
+                      className="flex-shrink-0 min-h-[36px] px-3 touch-manipulation"
                     >
-                      {shoppingList.some(listItem => listItem.id === item.id) ? "Added" : "Add"}
+                      {shoppingList.some((listItem) => listItem.id === item.id)
+                        ? "Added"
+                        : "Add"}
                     </Button>
                   </div>
                 ))
@@ -257,34 +340,41 @@ export default function StorePage() {
         {/* Right side - Shopping List */}
         <Card>
           <CardHeader>
-            <CardTitle>Your Shopping List ({shoppingList.length} items)</CardTitle>
+            <CardTitle>
+              Your Shopping List ({shoppingList.length} items)
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {shoppingList.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">
-                Your shopping list is empty. Add items from the left to get started!
+              <p className="text-gray-500 text-center py-6 sm:py-8 text-sm sm:text-base">
+                Your shopping list is empty. Add items from the left to get
+                started!
               </p>
             ) : (
-              <div className="space-y-2 max-h-96 overflow-y-auto">
+              <div className="space-y-2 max-h-80 sm:max-h-96 overflow-y-auto">
                 {shoppingList.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center justify-between p-3 border rounded-lg bg-blue-50"
+                    className="flex items-center justify-between p-3 sm:p-4 border rounded-lg bg-blue-50 active:bg-blue-100 touch-manipulation"
                   >
-                    <div className="flex-1">
-                      <h4 className="font-medium">{item.name}</h4>
+                    <div className="flex-1 min-w-0 pr-2">
+                      <h4 className="font-medium text-sm sm:text-base truncate">
+                        {item.name}
+                      </h4>
                       {item.description && (
-                        <p className="text-sm text-gray-600">{item.description}</p>
+                        <p className="text-xs sm:text-sm text-gray-600 truncate mt-1">
+                          {item.description}
+                        </p>
                       )}
-                      <Badge variant="outline" className="mt-1">
-                        {item.categoryId}
+                      <Badge variant="outline" className="mt-1 text-xs">
+                        {item.categoryName}
                       </Badge>
                     </div>
                     <Button
                       size="sm"
                       variant="destructive"
                       onClick={() => removeFromShoppingList(item.id)}
-                      className="ml-2"
+                      className="flex-shrink-0 min-h-[36px] px-3 touch-manipulation"
                     >
                       Remove
                     </Button>
