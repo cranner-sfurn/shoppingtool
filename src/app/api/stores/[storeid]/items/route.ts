@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { storeItem, store } from "@/db/schema";
+import { storeItem, store, category } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
@@ -43,10 +43,18 @@ export async function GET(
       return NextResponse.json({ error: "Store not found" }, { status: 404 });
     }
 
-    // Fetch all items for the store
+    // Fetch all items for the store with category information
     const result = await db
-      .select()
+      .select({
+        id: storeItem.id,
+        storeId: storeItem.storeId,
+        categoryId: storeItem.categoryId,
+        categoryName: category.name,
+        name: storeItem.name,
+        description: storeItem.description,
+      })
       .from(storeItem)
+      .innerJoin(category, eq(storeItem.categoryId, category.id))
       .where(eq(storeItem.storeId, storeId));
 
     // Cache the result with 1 hour TTL (3600 seconds)

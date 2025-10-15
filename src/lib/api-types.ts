@@ -12,6 +12,7 @@ export interface StoreItemApiResponse {
   id: string;
   storeId: string;
   categoryId: string;
+  categoryName: string;
   name: string;
   description: string | null;
 }
