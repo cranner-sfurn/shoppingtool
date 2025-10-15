@@ -14,14 +14,16 @@
   "kv_namespaces": [
     {
       "binding": "CACHE",
-      "id": "17c43d8b535e4d07a748591fdab73e65"
+      "id": "17c43d8b535e4d07a748591fdab73e65",
+      "preview_id": "0b4fbeedabeb4139a8ff930412960f0c"
     }
   ],
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "shoppingtool-db",
-      "database_id": "a441a3f2-e918-46f8-b385-b9c815b94021"
+      "database_id": "a441a3f2-e918-46f8-b385-b9c815b94021",
+      "migrations_dir": "drizzle"
     }
   ],
   "observability": {

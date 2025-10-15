@@ -51,6 +51,7 @@
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "dev": "next dev --turbopack",
     "dev:https": "next dev --turbopack --experimental-https",
+    "dev:remote": "wrangler dev --remote",
     "lint": "next lint",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "start": "next start"
