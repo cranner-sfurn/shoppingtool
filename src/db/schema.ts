@@ -36,8 +36,6 @@ export const category = sqliteTable("Category", {
 export const node = sqliteTable("Node", {
   id: text().primaryKey().notNull(),
   name: text().notNull(),
-  latitude: real().notNull(),
-  longitude: real().notNull(),
   isCategory: integer({ mode: "boolean" }).notNull().default(false), // true if this node represents a category
   storeId: text()
     .notNull()
