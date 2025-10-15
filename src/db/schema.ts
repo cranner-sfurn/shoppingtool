@@ -20,18 +20,28 @@ export const store = sqliteTable("Store", {
   name: text().notNull(),
   latitude: real().notNull(),
   longitude: real().notNull(),
+  adjacencyList: text().notNull(), // JSON string of AdjacencyList for pathfinding
 });
 
-export const aisle = sqliteTable("Aisle", {
+export const category = sqliteTable("Category", {
   id: text().primaryKey().notNull(),
+  name: text().notNull(),
+  description: text(),
+  nodeId: text().references(() => node.id, {
+    onDelete: "set null",
+    onUpdate: "cascade",
+  }),
+});
+
+export const node = sqliteTable("Node", {
+  id: text().primaryKey().notNull(),
+  name: text().notNull(),
+  latitude: real().notNull(),
+  longitude: real().notNull(),
+  isCategory: integer({ mode: "boolean" }).notNull().default(false), // true if this node represents a category
   storeId: text()
     .notNull()
     .references(() => store.id, { onDelete: "cascade", onUpdate: "cascade" }),
-  name: text().notNull(),
-  startLatitude: real().notNull(),
-  startLongitude: real().notNull(),
-  endLatitude: real().notNull(),
-  endLongitude: real().notNull(),
 });
 
 export const storeItem = sqliteTable("StoreItem", {
@@ -39,9 +49,12 @@ export const storeItem = sqliteTable("StoreItem", {
   storeId: text()
     .notNull()
     .references(() => store.id, { onDelete: "cascade", onUpdate: "cascade" }),
-  aisleId: text()
+  categoryId: text()
     .notNull()
-    .references(() => aisle.id, { onDelete: "cascade", onUpdate: "cascade" }),
+    .references(() => category.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
   name: text().notNull(),
   description: text(),
 });
