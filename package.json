@@ -54,6 +54,9 @@
     "dev:remote": "wrangler dev --remote",
     "lint": "next lint",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "start": "next start"
+    "start": "next start",
+    "db:reset": "rm -rf .wrangler && wrangler d1 export shoppingtool-db --remote --output=temp-remote-data.sql && wrangler d1 execute shoppingtool-db --file=temp-remote-data.sql && rm temp-remote-data.sql",
+    "db:migrate": "npx drizzle-kit generate && wrangler d1 migrations apply shoppingtool-db",
+    "db:migrate:remote": "wrangler d1 migrations apply shoppingtool-db --remote"
   }
 }
