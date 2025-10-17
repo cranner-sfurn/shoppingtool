@@ -12,16 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-
-// Types for store items
-interface StoreItem {
-  id: string;
-  storeId: string;
-  categoryId: string;
-  categoryName: string;
-  name: string;
-  description?: string;
-}
+import type { StoreItem } from "@/lib/types";
 
 // fetch the store data from the api
 async function fetchStore(storeId: string): Promise<StoreApiResponse> {
@@ -127,11 +118,8 @@ export default function StorePage() {
       return acc;
     }, {} as Record<string, StoreItem[]>);
 
-    console.log(
-      "Route generated - Items grouped by category:",
-      groupedByCategory
-    );
-    // For now, just log the grouped items. In the future, this could navigate to a route page
+    console.log(groupedByCategory);
+    // TODO: Navigate to a route page
   };
 
   // show loading whilst we get the store data and items
@@ -228,11 +216,8 @@ export default function StorePage() {
             ← Back
           </Button>
           {shoppingList.length > 0 && (
-            <Button
-              onClick={generateRoute}
-              className="bg-blue-600 hover:bg-blue-700 text-sm px-3 py-2"
-            >
-              Route ({shoppingList.length})
+            <Button onClick={generateRoute} className="text-sm">
+              Get path ({shoppingList.length})
             </Button>
           )}
         </div>
@@ -359,7 +344,7 @@ export default function StorePage() {
                 {shoppingList.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center justify-between p-3 sm:p-4 border rounded-lg bg-blue-50 active:bg-blue-100 touch-manipulation"
+                    className="flex items-center justify-between p-3 sm:p-4 border rounded-lg touch-manipulation"
                   >
                     <div className="flex-1 min-w-0 pr-2">
                       <h4 className="font-medium text-sm sm:text-base truncate">
@@ -370,7 +355,7 @@ export default function StorePage() {
                           {item.description}
                         </p>
                       )}
-                      <Badge variant="outline" className="mt-1 text-xs">
+                      <Badge variant="secondary" className="mt-1 text-xs">
                         {item.categoryName}
                       </Badge>
                     </div>
