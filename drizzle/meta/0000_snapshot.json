@@ -4,38 +4,6 @@
   "version": "6",
   "dialect": "sqlite",
   "tables": {
-    "d1_migrations": {
-      "name": "d1_migrations",
-      "columns": {
-        "id": {
-          "autoincrement": true,
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": false
-        },
-        "name": {
-          "autoincrement": false,
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "applied_at": {
-          "default": "(CURRENT_TIMESTAMP)",
-          "autoincrement": false,
-          "name": "applied_at",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "compositePrimaryKeys": {},
-      "indexes": {},
-      "foreignKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
     "Store": {
       "name": "Store",
       "columns": {
@@ -66,6 +34,13 @@
           "type": "real",
           "primaryKey": false,
           "notNull": true
+        },
+        "adjacencyList": {
+          "autoincrement": false,
+          "name": "adjacencyList",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "compositePrimaryKeys": {},
@@ -74,21 +49,14 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "Aisle": {
-      "name": "Aisle",
+    "Category": {
+      "name": "Category",
       "columns": {
         "id": {
           "autoincrement": false,
           "name": "id",
           "type": "text",
           "primaryKey": true,
-          "notNull": true
-        },
-        "storeId": {
-          "autoincrement": false,
-          "name": "storeId",
-          "type": "text",
-          "primaryKey": false,
           "notNull": true
         },
         "name": {
@@ -98,31 +66,63 @@
           "primaryKey": false,
           "notNull": true
         },
-        "startLatitude": {
+        "nodeId": {
           "autoincrement": false,
-          "name": "startLatitude",
-          "type": "real",
+          "name": "nodeId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {
+        "Category_nodeId_Node_id_fk": {
+          "name": "Category_nodeId_Node_id_fk",
+          "tableFrom": "Category",
+          "tableTo": "Node",
+          "columnsFrom": [
+            "nodeId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "cascade"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "Node": {
+      "name": "Node",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "autoincrement": false,
+          "name": "name",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "startLongitude": {
+        "isCategory": {
+          "default": false,
           "autoincrement": false,
-          "name": "startLongitude",
-          "type": "real",
+          "name": "isCategory",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "endLatitude": {
+        "storeId": {
           "autoincrement": false,
-          "name": "endLatitude",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "endLongitude": {
-          "autoincrement": false,
-          "name": "endLongitude",
-          "type": "real",
+          "name": "storeId",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         }
@@ -130,9 +130,9 @@
       "compositePrimaryKeys": {},
       "indexes": {},
       "foreignKeys": {
-        "Aisle_storeId_Store_id_fk": {
-          "name": "Aisle_storeId_Store_id_fk",
-          "tableFrom": "Aisle",
+        "Node_storeId_Store_id_fk": {
+          "name": "Node_storeId_Store_id_fk",
+          "tableFrom": "Node",
           "tableTo": "Store",
           "columnsFrom": [
             "storeId"
@@ -164,9 +164,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "aisleId": {
+        "categoryId": {
           "autoincrement": false,
-          "name": "aisleId",
+          "name": "categoryId",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -189,12 +189,12 @@
       "compositePrimaryKeys": {},
       "indexes": {},
       "foreignKeys": {
-        "StoreItem_aisleId_Aisle_id_fk": {
-          "name": "StoreItem_aisleId_Aisle_id_fk",
+        "StoreItem_categoryId_Category_id_fk": {
+          "name": "StoreItem_categoryId_Category_id_fk",
           "tableFrom": "StoreItem",
-          "tableTo": "Aisle",
+          "tableTo": "Category",
           "columnsFrom": [
-            "aisleId"
+            "categoryId"
           ],
           "columnsTo": [
             "id"
@@ -216,6 +216,38 @@
           "onUpdate": "cascade"
         }
       },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "d1_migrations": {
+      "name": "d1_migrations",
+      "columns": {
+        "id": {
+          "autoincrement": true,
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "autoincrement": false,
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applied_at": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "applied_at",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
     }

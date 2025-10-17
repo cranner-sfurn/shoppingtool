@@ -5,8 +5,15 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1759938858388,
-      "tag": "0000_left_stick",
+      "when": 1760533344738,
+      "tag": "0000_tiny_killer_shrike",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1760534341816,
+      "tag": "0001_mighty_stingray",
       "breakpoints": true
     }
   ]

@@ -1,3 +1,8 @@
+export interface Coordinates {
+  latitude: number;
+  longitude: number;
+}
+
 // Haversine formula to calculate distance between two coordinates, returns distance in meters
 export function calculateDistance(
   lat1: number,

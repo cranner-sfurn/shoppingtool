@@ -7,7 +7,7 @@ import React, {
   useState,
   ReactNode,
 } from "react";
-import { Coordinates } from "./types";
+import { Coordinates } from "./coordinates";
 
 interface LocationContextType {
   location: Coordinates | null;
