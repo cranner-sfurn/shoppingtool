@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import type { StoreItem } from "@/lib/types";
+import { calculateShoppingPath } from "@/lib/path-utils";
 
 // fetch the store data from the api
 async function fetchStore(storeId: string): Promise<StoreApiResponse> {
@@ -41,6 +42,7 @@ export default function StorePage() {
   const [shoppingList, setShoppingList] = useState<StoreItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [isCalculatingPath, setIsCalculatingPath] = useState(false);
 
   // get the store data from the api
   const {
@@ -108,18 +110,23 @@ export default function StorePage() {
     setShoppingList((prev) => prev.filter((item) => item.id !== itemId));
   };
 
-  // Generate route by grouping items by category
-  const generateRoute = () => {
-    const groupedByCategory = shoppingList.reduce((acc, item) => {
-      if (!acc[item.categoryName]) {
-        acc[item.categoryName] = [];
-      }
-      acc[item.categoryName].push(item);
-      return acc;
-    }, {} as Record<string, StoreItem[]>);
+  // Generate path by calculating shortest path
+  const generatePath = async () => {
+    if (shoppingList.length === 0) return;
 
-    console.log(groupedByCategory);
-    // TODO: Navigate to a route page
+    setIsCalculatingPath(true);
+    try {
+      const pathResult = await calculateShoppingPath(storeId, shoppingList);
+
+      // Store path result in localStorage and navigate to path page
+      localStorage.setItem("pathResult", JSON.stringify(pathResult));
+      router.push(`/store/${storeId}/path`);
+    } catch (error) {
+      console.error("Error calculating path:", error);
+      // TODO: Show error message to user
+    } finally {
+      setIsCalculatingPath(false);
+    }
   };
 
   // show loading whilst we get the store data and items
@@ -216,8 +223,14 @@ export default function StorePage() {
             ← Back
           </Button>
           {shoppingList.length > 0 && (
-            <Button onClick={generateRoute} className="text-sm">
-              Get path ({shoppingList.length})
+            <Button
+              onClick={generatePath}
+              className="text-sm"
+              disabled={isCalculatingPath}
+            >
+              {isCalculatingPath
+                ? "Calculating..."
+                : `Get path (${shoppingList.length})`}
             </Button>
           )}
         </div>

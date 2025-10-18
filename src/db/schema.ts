@@ -39,6 +39,8 @@ export const node = sqliteTable("Node", {
   storeId: text()
     .notNull()
     .references(() => store.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  x: real(), // percentage (0-100) from left edge of map
+  y: real(), // percentage (0-100) from top edge of map
 });
 
 export const nodeConnection = sqliteTable("NodeConnection", {
