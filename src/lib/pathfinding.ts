@@ -18,7 +18,10 @@ export interface PairwisePathInfo {
   path: string[]; // inclusive of endpoints
 }
 
-export type PairwiseShortestPaths = Record<string, Record<string, PairwisePathInfo | null>>;
+export type PairwiseShortestPaths = Record<
+  string,
+  Record<string, PairwisePathInfo | null>
+>;
 
 export interface TspSolution {
   order: string[]; // order over target nodes (and optional fixed endpoints at ends)
@@ -82,7 +85,11 @@ export function dijkstra(graph: AdjacencyList, start: string): DijkstraResult {
   return { distances, previous };
 }
 
-export function reconstructPath(previous: Record<string, string | null>, start: string, end: string): string[] | null {
+export function reconstructPath(
+  previous: Record<string, string | null>,
+  start: string,
+  end: string
+): string[] | null {
   if (start === end) return [start];
   if (!(end in previous) || previous[end] === undefined) return null;
   const path: string[] = [];
@@ -118,7 +125,10 @@ export function getShortestPathsBetweenTargets(
       if (!path) {
         result[a][b] = null;
       } else {
-        result[a][b] = { distance: distances[b] ?? Number.POSITIVE_INFINITY, path };
+        result[a][b] = {
+          distance: distances[b] ?? Number.POSITIVE_INFINITY,
+          path,
+        };
       }
     }
   }
@@ -159,8 +169,12 @@ export function solveTSP(
 
   // DP over subsets: dp[mask][j] = minimal cost to reach j with visited set mask
   const size = 1 << n;
-  const dp: number[][] = Array.from({ length: size }, () => Array(n).fill(Number.POSITIVE_INFINITY));
-  const parent: number[][] = Array.from({ length: size }, () => Array(n).fill(-1));
+  const dp: number[][] = Array.from({ length: size }, () =>
+    Array(n).fill(Number.POSITIVE_INFINITY)
+  );
+  const parent: number[][] = Array.from({ length: size }, () =>
+    Array(n).fill(-1)
+  );
 
   // Initialize
   if (startIdx !== undefined) {
@@ -225,7 +239,7 @@ export function solveTSP(
   }
   orderIdx.reverse();
 
-  const order = orderIdx.map(i => targets[i]);
+  const order = orderIdx.map((i) => targets[i]);
 
   return { order, cost: bestCost };
 }
@@ -255,7 +269,9 @@ export function reconstructFullPath(
 }
 
 // ----- Orchestration helper -----
-export function solveShortestVisitingRoute(opts: SolveShortestVisitingRouteOptions): SolveShortestVisitingRouteResult | null {
+export function solveShortestVisitingRoute(
+  opts: SolveShortestVisitingRouteOptions
+): SolveShortestVisitingRouteResult | null {
   const { graph } = opts;
   const required = Array.from(new Set(opts.required));
   if (required.length === 0) return { totalCost: 0, route: [] };
@@ -274,5 +290,3 @@ export function solveShortestVisitingRoute(opts: SolveShortestVisitingRouteOptio
   const { route, totalCost } = reconstructFullPath(pairwise, tsp.order);
   return { totalCost, route };
 }
-
-

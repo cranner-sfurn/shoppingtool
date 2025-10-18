@@ -72,7 +72,7 @@ export default function RoutePage() {
           </Button>
         </div>
         <h1 className="text-xl sm:text-2xl font-bold text-center sm:text-left">
-          Your Shopping Route
+          Your Shopping Path
         </h1>
       </div>
 
@@ -80,7 +80,7 @@ export default function RoutePage() {
         {/* Interactive Store Map */}
         <Card>
           <CardHeader>
-            <CardTitle>Your Route</CardTitle>
+            <CardTitle>Your Path</CardTitle>
           </CardHeader>
           <CardContent>
             <StoreMapWithRoute
@@ -93,7 +93,7 @@ export default function RoutePage() {
         {/* Route Steps */}
         <Card>
           <CardHeader>
-            <CardTitle>Step-by-Step Route</CardTitle>
+            <CardTitle>Step-by-Step Path</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
