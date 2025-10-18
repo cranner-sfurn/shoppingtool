@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { PathResultWithNodes } from "@/lib/types";
 import StoreMapWithPath from "@/components/StoreMapWithPath";
 
-export default function RoutePage() {
+export default function PathPage() {
   const params = useParams();
   const router = useRouter();
   const storeId = params.storeid as string;
@@ -90,7 +90,7 @@ export default function RoutePage() {
           </CardContent>
         </Card>
 
-        {/* Route Steps */}
+        {/* Path Steps */}
         <Card>
           <CardHeader>
             <CardTitle>Step-by-Step Path</CardTitle>

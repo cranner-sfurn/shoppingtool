@@ -33,12 +33,12 @@ export interface Category {
   nodeId: string | null;
 }
 
-export interface RouteResult {
+export interface PathResult {
   totalCost: number;
-  route: string[]; // node names in order
+  path: string[]; // node names in order
 }
 
-export interface RouteResultWithNodes {
+export interface PathResultWithNodes {
   totalCost: number;
-  routeNodes: Node[]; // full node objects with coordinates
+  pathNodes: Node[]; // full node objects with coordinates
 }
