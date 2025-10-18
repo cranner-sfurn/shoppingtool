@@ -102,7 +102,7 @@ export default function RoutePage() {
                   key={index}
                   className="flex items-center gap-4 p-3 border rounded-lg"
                 >
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium">
                     {index + 1}
                   </div>
                   <div className="flex-1">
