@@ -1,4 +1,4 @@
-// Graph/pathfinding utilities for computing a minimal route visiting required nodes
+// Graph/pathfinding utilities for computing a minimal path visiting required nodes
 
 // ----- Types -----
 export interface WeightedEdge {
@@ -18,23 +18,26 @@ export interface PairwisePathInfo {
   path: string[]; // inclusive of endpoints
 }
 
-export type PairwiseShortestPaths = Record<string, Record<string, PairwisePathInfo | null>>;
+export type PairwiseShortestPaths = Record<
+  string,
+  Record<string, PairwisePathInfo | null>
+>;
 
 export interface TspSolution {
   order: string[]; // order over target nodes (and optional fixed endpoints at ends)
   cost: number;
 }
 
-export interface SolveShortestVisitingRouteOptions {
+export interface SolveShortestVisitingPathOptions {
   graph: AdjacencyList;
   required: string[]; // nodes to visit at least once
   start?: string; // optional fixed start
   end?: string; // optional fixed end
 }
 
-export interface SolveShortestVisitingRouteResult {
+export interface SolveShortestVisitingPathResult {
   totalCost: number;
-  route: string[]; // full route including intermediate nodes along shortest paths
+  path: string[]; // full path including intermediate nodes along shortest paths
 }
 
 // ----- Dijkstra -----
@@ -82,7 +85,11 @@ export function dijkstra(graph: AdjacencyList, start: string): DijkstraResult {
   return { distances, previous };
 }
 
-export function reconstructPath(previous: Record<string, string | null>, start: string, end: string): string[] | null {
+export function reconstructPath(
+  previous: Record<string, string | null>,
+  start: string,
+  end: string
+): string[] | null {
   if (start === end) return [start];
   if (!(end in previous) || previous[end] === undefined) return null;
   const path: string[] = [];
@@ -118,7 +125,10 @@ export function getShortestPathsBetweenTargets(
       if (!path) {
         result[a][b] = null;
       } else {
-        result[a][b] = { distance: distances[b] ?? Number.POSITIVE_INFINITY, path };
+        result[a][b] = {
+          distance: distances[b] ?? Number.POSITIVE_INFINITY,
+          path,
+        };
       }
     }
   }
@@ -159,8 +169,12 @@ export function solveTSP(
 
   // DP over subsets: dp[mask][j] = minimal cost to reach j with visited set mask
   const size = 1 << n;
-  const dp: number[][] = Array.from({ length: size }, () => Array(n).fill(Number.POSITIVE_INFINITY));
-  const parent: number[][] = Array.from({ length: size }, () => Array(n).fill(-1));
+  const dp: number[][] = Array.from({ length: size }, () =>
+    Array(n).fill(Number.POSITIVE_INFINITY)
+  );
+  const parent: number[][] = Array.from({ length: size }, () =>
+    Array(n).fill(-1)
+  );
 
   // Initialize
   if (startIdx !== undefined) {
@@ -225,7 +239,7 @@ export function solveTSP(
   }
   orderIdx.reverse();
 
-  const order = orderIdx.map(i => targets[i]);
+  const order = orderIdx.map((i) => targets[i]);
 
   return { order, cost: bestCost };
 }
@@ -234,10 +248,10 @@ export function solveTSP(
 export function reconstructFullPath(
   matrix: PairwiseShortestPaths,
   order: string[]
-): { route: string[]; totalCost: number } {
-  if (order.length === 0) return { route: [], totalCost: 0 };
+): { path: string[]; totalCost: number } {
+  if (order.length === 0) return { path: [], totalCost: 0 };
   let totalCost = 0;
-  const route: string[] = [order[0]];
+  const path: string[] = [order[0]];
   for (let i = 0; i < order.length - 1; i++) {
     const from = order[i];
     const to = order[i + 1];
@@ -248,17 +262,19 @@ export function reconstructFullPath(
     totalCost += info.distance;
     // concatenate without repeating the starting node
     for (let j = 1; j < info.path.length; j++) {
-      route.push(info.path[j]);
+      path.push(info.path[j]);
     }
   }
-  return { route, totalCost };
+  return { path, totalCost };
 }
 
 // ----- Orchestration helper -----
-export function solveShortestVisitingRoute(opts: SolveShortestVisitingRouteOptions): SolveShortestVisitingRouteResult | null {
+export function solveShortestVisitingPath(
+  opts: SolveShortestVisitingPathOptions
+): SolveShortestVisitingPathResult | null {
   const { graph } = opts;
   const required = Array.from(new Set(opts.required));
-  if (required.length === 0) return { totalCost: 0, route: [] };
+  if (required.length === 0) return { totalCost: 0, path: [] };
 
   // If start/end provided but not in required, include them as mandatory waypoints at ends
   const targets: string[] = (() => {
@@ -271,8 +287,6 @@ export function solveShortestVisitingRoute(opts: SolveShortestVisitingRouteOptio
   const pairwise = getShortestPathsBetweenTargets(graph, targets);
   const tsp = solveTSP(pairwise, targets, opts.start, opts.end);
   if (!tsp) return null;
-  const { route, totalCost } = reconstructFullPath(pairwise, tsp.order);
-  return { totalCost, route };
+  const { path, totalCost } = reconstructFullPath(pairwise, tsp.order);
+  return { totalCost, path };
 }
-
-
