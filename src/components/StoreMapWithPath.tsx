@@ -62,15 +62,7 @@ export default function StoreMapWithPath({
       .join(" ");
   };
 
-  // Generate path string for SVG polyline (the line that joins the path nodes)
-  const getPathString = () => {
-    return pathNodes
-      .map((node) => {
-        const pos = getNodePosition(node);
-        return `${pos.x},${pos.y}`;
-      })
-      .join(" ");
-  };
+ 
 
   // Group nodes by ID to get all step numbers for each unique node
   const getNodeSteps = () => {
